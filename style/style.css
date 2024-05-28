@@ -1,0 +1,38 @@
+.formcontainer {
+    width: 1000px;
+    padding: 5px;
+}
+
+.formlabel {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    padding: 5px;
+}
+.error {
+    color: red;
+    padding-left: 5px;
+}
+table, th, td {
+  text-align: left;
+  padding: 8px;
+  border: 1px solid black;
+  border-collapse: collapse;
+  white-space:nowrap;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+  
+html, body {
+	height: 100%;
+	margin: 0;
+}
+.leaflet-container {
+	height: 400px;
+		width: 600px;
+		max-width: 100%;
+		max-height: 100%;
+}

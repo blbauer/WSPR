@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="Polygon - Company Details">
+    <meta name="keywords" content="HTML, CSS,JavaScript, AJAX, jQuery">
+    <meta name="author" content="Bruce Bauer">
+    <title>WSPR Database</title>
+    <link href="style/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+</head>
+<body>
+    <form id="myform" onsubmit="return false">
+        <div class="formcontainer">
+            <h2>WSPR Data</h2>
+            <label for="Reporter" class="formlabel" >Enter Reporter: </label>
+            <input type="text" id="Reporter" name="Reporter" size="8" maxlength="8"
+                    data-rule-required="true"  data-msg-required="Reporter is Required"
+                    value="WA5LRU/2">
+            <label class="error" for="Reporter" id="ReporterError"></label>
+            <br>
+            <label for="FromDate" class="formlabel" >Enter From Date: </label>
+            <input type="date" id="FromDate" name="FromDate" size="10" maxlength="10"
+                    data-rule-required="true"  data-msg-required="From Date is Required"
+                    value = "2024-04-01">
+            <label class="error" for="FromDate" id="FromDateError"></label>
+            <br>
+            <label for="ToDate" class="formlabel" >Enter To Date: </label>
+            <input type="date" id="ToDate" name="ToDate" size="10" maxlength="10"
+                    data-rule-required="true"  data-msg-required="To Date is Required"
+                    value = "2024-04-28">
+            <label class="error" for="ToDate" id="ToDateError"></label>
+
+            <br><br>
+            <input type="submit" value="DisplayData" id="DisplayData" name="DisplayData" onclick="GetWSPRData();">
+            <input type="submit" formnovalidate value="Clear" id="Clear" name="Clear" onclick="ClearForm();">
+            <hr>
+            <br>
+            <div id="map" style="width: 600px; height: 400px;"></div>
+            <br>
+            <hr>
+            <div id="JSONdata"></div><br>
+            <div id="tabledata"></div><br>
+        </div>
+    </form>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <script src="scripts/script.js"></script>
+</body>
+</html>
