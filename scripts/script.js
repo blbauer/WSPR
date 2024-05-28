@@ -183,7 +183,7 @@ function showData() {
 
 function showMap() {
     	
-/*    const map = L.map('map').setView([51.505, -0.09], 13); */
+
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
 
 	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -196,7 +196,7 @@ function showMap() {
     latlon = []
     for (var i = 0; i < data_count; i++) {
         if (current_tx_loc != tx_loc[i]) {
-            marker.push(L.marker([tx_lat[i], tx_lon[i]]).addTo(map).bindPopup('Altitude: ' + altitude[i]).openPopup());
+            marker.push(L.marker([tx_lat[i], tx_lon[i]]).addTo(map).bindPopup("Date:" + time[i] + ' - Altitude: ' + altitude[i]).openPopup());
             current_tx_loc = tx_loc[i];
             /* add lat and lon to array for later polyline display */
             latlon.push([tx_lat[i],tx_lon[i]])
