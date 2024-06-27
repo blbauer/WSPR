@@ -1,3 +1,12 @@
+
+/* red pin icon */
+var RedPinIcon = L.icon({
+    iconUrl: 'red_pin.png',
+    iconSize: [25, 25],
+
+});
+
+
 /* The following values came from the database */
 
 var time = [];
@@ -114,8 +123,11 @@ async function GetWSPRData() {
 }
 
 function calcAltitude(power) {
+    if (power == 0) {
+        return 0
+    }
     for (var i = 0; i < powerTable.length; i++) {
-        if (power < powerTable[i][0]) {
+        if (power < powerTable[i][1]) {
             return powerTable[i-1][5]
         }
     }
@@ -193,21 +205,36 @@ function showMap() {
     
     const marker = [];
     current_tx_loc = "";
-    latlon = []
+    balloon_latlon = [];
     for (var i = 0; i < data_count; i++) {
         if (current_tx_loc != tx_loc[i]) {
             marker.push(L.marker([tx_lat[i], tx_lon[i]]).addTo(map).bindPopup("Date:" + time[i] + ' - Altitude: ' + altitude[i]).openPopup());
             current_tx_loc = tx_loc[i];
             /* add lat and lon to array for later polyline display */
-            latlon.push([tx_lat[i],tx_lon[i]])
+            balloon_latlon.push([tx_lat[i],tx_lon[i]]);
+            listener_latlon = [];
+            listener_latlon.push([tx_lat[i],tx_lon[i]]);
+            listener_latlon.push([rx_lat[i],rx_lon[i]]);
+/*
+            var listererpolyline = L.polyline(listener_latlon, {color: 'blue', weight: 1}).addTo(map);
+*/
+        } else {
+            listener_latlon = [];
+            listener_latlon.push([tx_lat[i],tx_lon[i]]);
+            listener_latlon.push([rx_lat[i],rx_lon[i]]);
+/*
+            var listererpolyline = L.polyline(listener_latlon, {color: 'blue', weight: 1}).addTo(map);
+*/
+            marker.push(L.marker([rx_lat[i], rx_lon[i]],{icon: RedPinIcon}).addTo(map).bindPopup(rx_sign[i]).openPopup());
+
         }
     }
 
     /* display lines connecting markers */
-    var polyline = L.polyline(latlon, {color: 'red'}).addTo(map);
+    var balloonpolyline = L.polyline(balloon_latlon, {color: 'red'}).addTo(map);
 
 // zoom the map to the polyline
-    map.fitBounds(polyline.getBounds());
+    map.fitBounds(balloonpolyline.getBounds());
 
 /*
     const circle = L.circle([51.508, -0.11], {
@@ -229,6 +256,7 @@ function showMap() {
 		.setContent('I am a standalone popup.')
 		.openOn(map);
 */
+    var popup = L.popup();
     function onMapClick(e) {
 	    popup
 		    .setLatLng(e.latlng)
