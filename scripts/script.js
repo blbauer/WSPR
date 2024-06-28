@@ -111,8 +111,10 @@ async function GetWSPRData() {
                 altitude[i] = calcAltitude(power[i]);
             }
             
-            showData();
             showMap();            
+            showData();
+            download_csv_file();
+
         }
         else {
             /* AJAX complete with error */
@@ -194,68 +196,54 @@ function showData() {
 
 
 function showMap() {
-    	
 
+    /* Create a map and set the center of the map to the first data point, probably the launch point */
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
 
+    /* Add streets and copyright */
 	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	}).addTo(map);
     
-    const marker = [];
-    current_tx_loc = "";
-    balloon_latlon = [];
-    for (var i = 0; i < data_count; i++) {
-        if (current_tx_loc != tx_loc[i]) {
-            marker.push(L.marker([tx_lat[i], tx_lon[i]]).addTo(map).bindPopup("Date:" + time[i] + ' - Altitude: ' + altitude[i]).openPopup());
-            current_tx_loc = tx_loc[i];
-            /* add lat and lon to array for later polyline display */
-            balloon_latlon.push([tx_lat[i],tx_lon[i]]);
-            listener_latlon = [];
-            listener_latlon.push([tx_lat[i],tx_lon[i]]);
-            listener_latlon.push([rx_lat[i],rx_lon[i]]);
-/*
-            var listererpolyline = L.polyline(listener_latlon, {color: 'blue', weight: 1}).addTo(map);
-*/
-        } else {
-            listener_latlon = [];
-            listener_latlon.push([tx_lat[i],tx_lon[i]]);
-            listener_latlon.push([rx_lat[i],rx_lon[i]]);
-/*
-            var listererpolyline = L.polyline(listener_latlon, {color: 'blue', weight: 1}).addTo(map);
-*/
-            marker.push(L.marker([rx_lat[i], rx_lon[i]],{icon: RedPinIcon}).addTo(map).bindPopup(rx_sign[i]).openPopup());
+    /* Marker is and array of pins on the map */
+    var marker = [];
 
+    /* Balloon track drops a once each time a balloon is heard.  Only one pin is dropped even when there are multiple listners */
+    var current_time = "";
+
+    /* Array of lat lon for each pin - used to draw polyline */
+    var balloon_latlon = [];
+
+    /* Arrays of listener callsigns - each time a pin is dropped, it is added to this array. 
+    The array is check so that multiple pins for the same location are not dropped.*/
+    var listeners = [];
+
+    for (var i = 0; i < data_count; i++) {
+
+        /* Only place a marker if we have encountered a new time */
+        if (current_time != time[i]) {
+            marker.push(L.marker([tx_lat[i], tx_lon[i]]).addTo(map).bindTooltip("Date:" + time[i] + ' - Altitude: ' + altitude[i]));
+            current_time = time[i];
+
+            /* add lat and lon to array for later polyline display */
+            balloon_latlon.push([tx_lat[i], tx_lon[i]]);
+
+            /* if the call sign exists in listeners then we have already dropped a pin for the listener */
+            if (!listeners.includes(rx_sign[i])) {
+                marker.push(L.marker([rx_lat[i], rx_lon[i]],{icon: RedPinIcon}).addTo(map).bindTooltip(rx_sign[i]));
+                listeners.push(rx_sign[i])
+            } 
         }
     }
 
     /* display lines connecting markers */
     var balloonpolyline = L.polyline(balloon_latlon, {color: 'red'}).addTo(map);
 
-// zoom the map to the polyline
+    /* zoom the map to the polyline */
     map.fitBounds(balloonpolyline.getBounds());
 
-/*
-    const circle = L.circle([51.508, -0.11], {
-		color: 'red',
-		fillColor: '#f03',
-		fillOpacity: 0.5,
-		radius: 500
-	}).addTo(map).bindPopup('I am a circle.');
-
-	const polygon = L.polygon([
-		[51.509, -0.08],
-		[51.503, -0.06],
-		[51.51, -0.047]
-	]).addTo(map).bindPopup('I am a polygon.');
-
-
-	const popup = L.popup()
-		.setLatLng([51.513, -0.09])
-		.setContent('I am a standalone popup.')
-		.openOn(map);
-*/
+    /* if the user clicks on the map - display the lat/lon coordinates */
     var popup = L.popup();
     function onMapClick(e) {
 	    popup
@@ -265,6 +253,30 @@ function showMap() {
     }
     map.on('click', onMapClick);
     
+}
+
+function download_csv_file() {
+    // https://www.javatpoint.com/oprweb/test.jsp?filename=javascript-create-and-download-csv-file1
+    //define the heading for each row of the data
+  
+    var csv = "Lat" + "," + "Lon" + "\n";
+    var row;
+    for (var i = 0; i < data_count; i++) {
+        row = tx_lat[i] + "," + tx_lon[i] + "\n";
+        csv += row;
+    }
+
+    //display the created CSV data on the web browser 
+//    document.write(csv);
+
+   
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+    
+    //provide the name for the CSV file to be downloaded
+    hiddenElement.download = 'LatLon.csv';
+    hiddenElement.click();
 }
 
 function ClearForm() {
