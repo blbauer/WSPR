@@ -35,12 +35,22 @@
             <label class="error" for="ToDate" id="ToDateError"></label>
 
             <br><br>
-            <input type="submit" value="DisplayData" id="DisplayData" name="DisplayData" onclick="GetWSPRData();">
+            <label class="formlabel">Cars: </label>
+            <label for="rdChevrolet"><input type="radio" id="rdChevrolet" name="rdcar" value="Chevrolet" 
+    data-rule-required="true" data-msg-required="Car is Required" />Chevrolet</label><br>
+            <label class="formlabel"></label>
+            <label for="rdFord"><input type="radio" id="rdFord" name="rdcar" value="Ford" />Ford Motor</label><br>
+            <label class="formlabel"></label>
+            <label for="rdDodge"><input type="radio" id="rdDodge" name="rdcar" value="Dodge" />Dodge Ram</label><br>
+            <label for="rdcar" class="error"></label>
+<br>
+            <input type="submit" value="DisplayData" id="DisplayData" name="DisplayData" onclick="ProcessForm();">
             <input type="submit" formnovalidate value="Clear" id="Clear" name="Clear" onclick="ClearForm();">
             <hr>
+            <div id="status"></div>
             <br>
             <div id="map" style="width: 1200px; height: 800px;"></div>
-            <div id="recordcount">/div><br>
+            <div id="recordcount"></div><br>
             <div id="tabledata"></div><br>
         </div>
     </form>

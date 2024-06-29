@@ -1,9 +1,9 @@
+"use strict";
 
 /* red pin icon */
 var RedPinIcon = L.icon({
     iconUrl: 'red_pin.png',
     iconSize: [25, 25],
-
 });
 
 
@@ -28,10 +28,8 @@ var snr = [];
 var drift = [];
 var version = [];
 var code = [];
+var altitude = []      // Altitude is a calculated value
 
-/* Altitude is a calculated value */
-var altitude = []
-var data_count;
 
 /* Create the Power Table to Calculate the Altitude */
 /* Contains Power dBm, Power Watt, Altitude (min), Altitude (max), Altitude (avg), Altitude (ft) */
@@ -57,74 +55,81 @@ powerTable.push([57, 500,	17100,	18000   ,0,0]);
 powerTable.push([60, 1000,	18000,	18000   ,0,0]);
 
 for (var i = 0; i < powerTable.length; i++) {
+    // Since the a given values is a range of altitudes, we will average the upper and lower values
     powerTable[i][4] = Math.round((powerTable[i][2] + powerTable[i][3]) / 2)
+    // powertable is in meters, so we will convert it to ft
     powerTable[i][5] = Math.round(powerTable[i][4] * 3.28084)
 }
 
+var Reporter = "";
+var FromDate = "";
+var ToDate = "";
 
-async function GetWSPRData() {
-    "use strict";
+var wsprDataPoints;         // Number of data values from WSPR database
+var wsprSpots               // Number of unique balloon spots
+var wsprListeners           // Number of unique listeners
 
+async function ProcessForm() {
     // Get a reference to the form - Use the ID of the form
     var form = $("#myform");
     
       // If all of the form elements are valid, the get the form values
-    if (form.valid()) {
-        
-        var Reporter = document.getElementById("Reporter").value;
-        var FromDate = document.getElementById("FromDate").value;
-        var ToDate = document.getElementById("ToDate").value;
+    if (form.valid()) { 
+        document.getElementById("status").innerHTML = "Retrieving Data..."  
+        Reporter = document.getElementById("Reporter").value;
+        FromDate = document.getElementById("FromDate").value;
+        ToDate = document.getElementById("ToDate").value;
 
         /* URL for AJAX Call */
-        var myURL1 = "https://db1.wspr.live/?query=SELECT * FROM wspr.rx where tx_sign = '" + Reporter + "' and time >= '" + FromDate + "' and time <= '" + ToDate + "' ORDER BY time ASC FORMAT JSON"
+        var wsprURL = "https://db1.wspr.live/?query=SELECT * FROM wspr.rx where tx_sign = '" + Reporter + "' and time >= '" + FromDate + "' and time <= '" + ToDate + "' ORDER BY time ASC FORMAT JSON"
         /* Make the AJAX call */
-        var msg1Object = await fetch(myURL1);
+        var wsprObject = await fetch(wsprURL);
         /* Check the status */
-        if (msg1Object.status == 200) {            
-            var msg1JSONText = await msg1Object.text();
-
+        if (wsprObject.status == 200) {            
+            var wsprJSONText = await wsprObject.text();
             // Parse the JSON string into an object
-            var msg1 = JSON.parse(msg1JSONText);
+            var wsprData = JSON.parse(wsprJSONText);
 
             /* Pull the data from the message object and place it in local variables */
-            data_count = msg1.data.length;
-            for (var i = 0; i < data_count; i++) {
-                time[i] = msg1.data[i].time;
-                band[i] = msg1.data[i].band;
-                rx_sign[i] = msg1.data[i].rx_sign;
-                rx_lat[i] = msg1.data[i].rx_lat;
-                rx_lon[i] = msg1.data[i].rx_lon;
-                rx_loc[i] = msg1.data[i].rx_loc;
-                tx_sign[i] = msg1.data[i].tx_sign;
-                tx_lat[i] = msg1.data[i].tx_lat;
-                tx_lon[i] = msg1.data[i].tx_lon;
-                tx_loc[i] = msg1.data[i].tx_loc;
-                distance[i] = msg1.data[i].distance;
-                tx_azimuth[i] = msg1.data[i].azimuth;
-                rx_azimuth[i] = msg1.data[i].rx_azimuth;
-                frequency[i] = msg1.data[i].frequency;
-                power[i] = msg1.data[i].power;
-                snr[i] = msg1.data[i].snr;
-                drift[i] = msg1.data[i].drift;
-                version[i] = msg1.data[i].version;
-                code[i] = msg1.data[i].code;
-                altitude[i] = calcAltitude(power[i]);
+            wsprDataPoints = wsprData.data.length;
+            for (var i = 0; i < wsprDataPoints; i++) {
+                time[i] = wsprData.data[i].time;
+                band[i] = wsprData.data[i].band;
+                rx_sign[i] = wsprData.data[i].rx_sign;
+                rx_lat[i] = wsprData.data[i].rx_lat;
+                rx_lon[i] = wsprData.data[i].rx_lon;
+                rx_loc[i] = wsprData.data[i].rx_loc;
+                tx_sign[i] = wsprData.data[i].tx_sign;
+                tx_lat[i] = wsprData.data[i].tx_lat;
+                tx_lon[i] = wsprData.data[i].tx_lon;
+                tx_loc[i] = wsprData.data[i].tx_loc;
+                distance[i] = wsprData.data[i].distance;
+                tx_azimuth[i] = wsprData.data[i].azimuth;
+                rx_azimuth[i] = wsprData.data[i].rx_azimuth;
+                frequency[i] = wsprData.data[i].frequency;
+                power[i] = wsprData.data[i].power;
+                snr[i] = wsprData.data[i].snr;
+                drift[i] = wsprData.data[i].drift;
+                version[i] = wsprData.data[i].version;
+                code[i] = wsprData.data[i].code;
+                altitude[i] = calcAltitude(power[i]); // Calculate Altitude from power
             }
-            
+            document.getElementById("status").innerHTML = "Drawing Map..."  
             showMap();            
+            document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listners: " + wsprListeners;   
             showData();
-            download_csv_file();
-
-        }
-        else {
+               // download_csv_file();
+    
+        } else {
             /* AJAX complete with error */
-            alert("Error Detected - Status: " + msg1Object.status)
+            alert("Error Detected - Status: " + wsprData.status)
             return;
-        }        
+        }       
     }
 }
 
 function calcAltitude(power) {
+"use strict";
     if (power == 0) {
         return 0
     }
@@ -137,6 +142,7 @@ function calcAltitude(power) {
 }
 
 function showData() {
+"use strict";
 
     /* Display the table header */
     var table = "<table>";
@@ -164,7 +170,7 @@ function showData() {
     table = table + "</tr>";
             
     /* Display the table data */
-    for (var i = 0; i < data_count; i++) {
+    for (var i = 0; i < wsprDataPoints; i++) {
         table = table + "<tr>";
         table = table + "<td>" + time[i] + "</td>";
         table = table + "<td>" + band[i] + "</td>";
@@ -196,6 +202,7 @@ function showData() {
 
 
 function showMap() {
+"use strict";
 
     /* Create a map and set the center of the map to the first data point, probably the launch point */
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
@@ -219,7 +226,7 @@ function showMap() {
     The array is check so that multiple pins for the same location are not dropped.*/
     var listeners = [];
 
-    for (var i = 0; i < data_count; i++) {
+    for (var i = 0; i < wsprDataPoints; i++) {
 
         /* Only place a marker if we have encountered a new time */
         if (current_time != time[i]) {
@@ -243,6 +250,10 @@ function showMap() {
     /* zoom the map to the polyline */
     map.fitBounds(balloonpolyline.getBounds());
 
+    wsprSpots = balloon_latlon.length;
+    wsprListeners = listeners.length;
+
+
     /* if the user clicks on the map - display the lat/lon coordinates */
     var popup = L.popup();
     function onMapClick(e) {
@@ -256,12 +267,14 @@ function showMap() {
 }
 
 function download_csv_file() {
+"use strict";
+
     // https://www.javatpoint.com/oprweb/test.jsp?filename=javascript-create-and-download-csv-file1
     //define the heading for each row of the data
   
     var csv = "Lat" + "," + "Lon" + "\n";
     var row;
-    for (var i = 0; i < data_count; i++) {
+    for (var i = 0; i < wsprDataPoints; i++) {
         row = tx_lat[i] + "," + tx_lon[i] + "\n";
         csv += row;
     }
@@ -280,6 +293,8 @@ function download_csv_file() {
 }
 
 function ClearForm() {
+    "use strict";
+
     document.getElementById("ReporterError").innerHTML = "";
     document.getElementById("FromDateError").innerHTML = "";
     document.getElementById("ToDateError").innerHTML = "";
