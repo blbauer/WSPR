@@ -66,8 +66,8 @@ var FromDate = "";
 var ToDate = "";
 
 var wsprDataPoints;         // Number of data values from WSPR database
-var wsprSpots               // Number of unique balloon spots
-var wsprListeners           // Number of unique listeners
+var wsprSpots;               // Number of unique balloon spots
+var wsprListeners;           // Number of unique listeners
 
 async function ProcessForm() {
     // Get a reference to the form - Use the ID of the form
@@ -75,7 +75,18 @@ async function ProcessForm() {
     
       // If all of the form elements are valid, the get the form values
     if (form.valid()) { 
-        document.getElementById("status").innerHTML = "Retrieving Data..."  
+
+        document.getElementById("map").style.display = "none";  
+        document.getElementById("data").style.display = "none";  
+        if (document.getElementById("rdShowMapAndListeners").checked || document.getElementById("rdShowMap").checked) {
+            document.getElementById("map").style.display = "inline-block";              
+        }
+        if (document.getElementById("rdShowData").checked) {
+            document.getElementById("data").style.display = "inline-block";              
+        }
+
+        document.getElementById("status").innerHTML = "Retrieving Data from Database...";  
+
         Reporter = document.getElementById("Reporter").value;
         FromDate = document.getElementById("FromDate").value;
         ToDate = document.getElementById("ToDate").value;
@@ -114,11 +125,34 @@ async function ProcessForm() {
                 code[i] = wsprData.data[i].code;
                 altitude[i] = calcAltitude(power[i]); // Calculate Altitude from power
             }
-            document.getElementById("status").innerHTML = "Drawing Map..."  
-            showMap();            
-            document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listners: " + wsprListeners;   
-            showData();
-               // download_csv_file();
+            if (document.getElementById("rdShowMap").checked) {
+                document.getElementById("status").innerHTML = "Drawing Map...";  
+                showMap(false);
+                document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
+            }            
+            if (document.getElementById("rdShowMapAndListeners").checked) {
+                document.getElementById("status").innerHTML = "Drawing Map...";  
+                showMap(true);
+                document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
+            }            
+
+            if (document.getElementById("rdShowData").checked) {
+                document.getElementById("status").innerHTML = "Drawing Map...";  
+                showData();
+                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+            }            
+
+            if (document.getElementById("rdDownloadCSVData").checked) {
+                document.getElementById("status").innerHTML = "Downloading Data...";  
+                downloadCSVFile();
+                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+            }            
+
+            if (document.getElementById("rdDownloadJSONData").checked) {
+                document.getElementById("status").innerHTML = "Downloading Data...";  
+                downloadJSONFile();
+                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+            }            
     
         } else {
             /* AJAX complete with error */
@@ -197,13 +231,15 @@ function showData() {
     table = table + "</table>";
             
     /* Display Table Data */
-    document.getElementById("tabledata").innerHTML = table;
+    document.getElementById("data").innerHTML = table;
 }
 
 
-function showMap() {
+function showMap(showListeners) {
 "use strict";
-
+/*  showListeners - true - show listeners on map
+    showListeners - false - do not show listeners on map
+*/
     /* Create a map and set the center of the map to the first data point, probably the launch point */
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
 
@@ -236,11 +272,15 @@ function showMap() {
             /* add lat and lon to array for later polyline display */
             balloon_latlon.push([tx_lat[i], tx_lon[i]]);
 
+            /* Display Listeners  */
             /* if the call sign exists in listeners then we have already dropped a pin for the listener */
             if (!listeners.includes(rx_sign[i])) {
-                marker.push(L.marker([rx_lat[i], rx_lon[i]],{icon: RedPinIcon}).addTo(map).bindTooltip(rx_sign[i]));
+            /*  Listeners not displayed - display it */
+                if (showListeners) {
+                    marker.push(L.marker([rx_lat[i], rx_lon[i]],{icon: RedPinIcon}).addTo(map).bindTooltip(rx_sign[i]));
+                }
                 listeners.push(rx_sign[i])
-            } 
+            }
         }
     }
 
@@ -266,31 +306,117 @@ function showMap() {
     
 }
 
-function download_csv_file() {
+function downloadCSVFile() {
 "use strict";
 
     // https://www.javatpoint.com/oprweb/test.jsp?filename=javascript-create-and-download-csv-file1
     //define the heading for each row of the data
   
-    var csv = "Lat" + "," + "Lon" + "\n";
-    var row;
+    var csv = "";
+    csv = csv + "Date/Time,";
+    csv = csv + "Band,";
+    csv = csv + "RX Sign,";
+    csv = csv + "RX Lat,";
+    csv = csv + "RX Long,";
+    csv = csv + "RX Loc,";
+    csv = csv + "TX Sign,";
+    csv = csv + "TX Lat,";
+    csv = csv + "TX Long,";
+    csv = csv + "TX Loc,";
+    csv = csv + "Dist,";
+    csv = csv + "TX Azm,";
+    csv = csv + "RX Azm,";
+    csv = csv + "Freq,";
+    csv = csv + "Pwr,";
+    csv = csv + "SNR,";
+    csv = csv + "Drift,";
+    csv = csv + "Version,";
+    csv = csv + "Code,";
+    csv = csv + "Altitude";
+    csv = csv + "\n";
+            
+    /* Format the data as CSV */
     for (var i = 0; i < wsprDataPoints; i++) {
-        row = tx_lat[i] + "," + tx_lon[i] + "\n";
-        csv += row;
+        csv = csv + time[i] + ",";
+        csv = csv + band[i] + ",";
+        csv = csv + rx_sign[i] + ",";
+        csv = csv + rx_lat[i] + ",";
+        csv = csv + rx_lon[i] + ",";
+        csv = csv + rx_loc[i] + ",";
+        csv = csv + tx_sign[i] + ",";
+        csv = csv + tx_lat[i] + ",";
+        csv = csv + tx_lon[i] + ",";
+        csv = csv + tx_loc[i] + ",";
+        csv = csv + distance[i] + ",";
+        csv = csv + tx_azimuth[i] + ",";
+        csv = csv + rx_azimuth[i] + ",";
+        csv = csv + frequency[i] + ",";
+        csv = csv + power[i] + ",";
+        csv = csv + snr[i] + ",";
+        csv = csv + drift[i] + ",";
+        csv = csv + version[i] + ",";
+        csv = csv + code[i] + ",";
+        csv = csv + altitude[i] + "\n";
     }
 
-    //display the created CSV data on the web browser 
-//    document.write(csv);
-
-   
     var hiddenElement = document.createElement('a');
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(wsprJSONText);
     hiddenElement.target = '_blank';
     
     //provide the name for the CSV file to be downloaded
-    hiddenElement.download = 'LatLon.csv';
+    hiddenElement.download = 'WSPRData.csv';
     hiddenElement.click();
 }
+
+function downloadJSONFile() {
+    "use strict";
+    
+        // https://www.javatpoint.com/oprweb/test.jsp?filename=javascript-create-and-download-csv-file1
+        //define the heading for each row of the data
+      
+        var dq = '"';
+        var eol = ",";
+        var json = '[';
+                
+        /* Format the data as JSON */
+        for (var i = 0; i < wsprDataPoints; i++) {
+            json = json + '{';
+            json = json + dq + "time" + dq + ":" + dq + time[i] + dq + eol;
+            json = json + dq + "band" + dq + ":" + band[i] + eol;
+            json = json + dq + "rx_sign" + dq + ":" + dq + rx_sign[i] + dq + eol;
+            json = json + dq + "rx_lat" + dq + ":" + rx_lat[i] + eol;
+            json = json + dq + "rx_lon" + dq + ":" + rx_lon[i] + eol;
+            json = json + dq + "rx_loc" + dq + ":" + dq + rx_loc[i] + dq + eol;
+            json = json + dq + "tx_sign" + dq + ":" + dq + tx_sign[i] + dq + eol;
+            json = json + dq + "tx_lat" + dq + ":" + tx_lat[i] + eol;
+            json = json + dq + "tx_lon" + dq + ":" + tx_lon[i] + eol;
+            json = json + dq + "tx_loc" + dq + ":" + dq + tx_loc[i] + dq + eol;
+            json = json + dq + "distance" + dq + ":" + distance[i] + eol;
+            json = json + dq + "tx_azimuth" + dq + ":" + tx_azimuth[i] + eol;
+            json = json + dq + "rx_azimuth" + dq + ":" + rx_azimuth[i] + eol;
+            json = json + dq + "frequency" + dq + ":" + frequency[i] + eol;
+            json = json + dq + "power" + dq + ":" + power[i] + eol;
+            json = json + dq + "snr" + dq + ":" + snr[i] + eol;
+            json = json + dq + "drift" + dq + ":" + drift[i] + eol;
+            json = json + dq + "version" + dq + ":" + dq + version[i] + dq + eol;
+            json = json + dq + "code" + dq + ":" + code[i] + eol;
+            json = json + dq + "altitude" + dq + ":" + altitude[i];
+            json = json + "},";
+        }
+        // remove extra comma
+        json = json.substring(0, json.length - 1);
+        json = json + "]";
+
+        var x = JSON.parse(json);
+    
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:application/json;charset=utf-8,' + encodeURI(json);
+        hiddenElement.target = '_blank';
+        
+        //provide the name for the json file to be downloaded
+        hiddenElement.download = 'WSPRData.json';
+        hiddenElement.click();
+    }
 
 function ClearForm() {
     "use strict";
