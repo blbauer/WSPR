@@ -125,34 +125,35 @@ async function ProcessForm() {
                 code[i] = wsprData.data[i].code;
                 altitude[i] = calcAltitude(power[i]); // Calculate Altitude from power
             }
-            if (document.getElementById("rdShowMap").checked) {
-                document.getElementById("status").innerHTML = "Drawing Map...";  
-                showMap(false);
-                document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
-            }            
-            if (document.getElementById("rdShowMapAndListeners").checked) {
-                document.getElementById("status").innerHTML = "Drawing Map...";  
-                showMap(true);
-                document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
-            }            
-
-            if (document.getElementById("rdShowData").checked) {
-                document.getElementById("status").innerHTML = "Drawing Map...";  
-                showData();
-                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
-            }            
-
-            if (document.getElementById("rdDownloadCSVData").checked) {
-                document.getElementById("status").innerHTML = "Downloading Data...";  
-                downloadCSVFile();
-                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
-            }            
-
-            if (document.getElementById("rdDownloadJSONData").checked) {
-                document.getElementById("status").innerHTML = "Downloading Data...";  
-                downloadJSONFile();
-                document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
-            }            
+            if (wsprDataPoints > 0) {
+                if (document.getElementById("rdShowMap").checked) {
+                    document.getElementById("status").innerHTML = "Drawing Map...";  
+                    showMap(false);
+                    document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
+                }            
+                if (document.getElementById("rdShowMapAndListeners").checked) {
+                    document.getElementById("status").innerHTML = "Drawing Map...";  
+                    showMap(true);
+                    document.getElementById("status").innerHTML = "Map Complete...Datapoints: " + wsprDataPoints + "...Spots: " + wsprSpots + "...Listeners: " + wsprListeners;   
+                }            
+                if (document.getElementById("rdShowData").checked) {
+                    document.getElementById("status").innerHTML = "Drawing Map...";  
+                    showData();
+                    document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+                }            
+                if (document.getElementById("rdDownloadCSVData").checked) {
+                    document.getElementById("status").innerHTML = "Downloading Data...";  
+                    downloadCSVFile();
+                    document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+                }            
+                if (document.getElementById("rdDownloadJSONData").checked) {
+                    document.getElementById("status").innerHTML = "Downloading Data...";  
+                    downloadJSONFile();
+                    document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
+                }
+            } else {
+                    document.getElementById("status").innerHTML = "No Datapoints Found...";                     
+                }            
     
         } else {
             /* AJAX complete with error */
@@ -240,6 +241,9 @@ function showMap(showListeners) {
 /*  showListeners - true - show listeners on map
     showListeners - false - do not show listeners on map
 */
+    /* Reset the Map div in case map as already displayed */
+    document.getElementById('mapdiv').innerHTML = "<div id='map' style='width: 1200px; height: 800px;'></div>";
+
     /* Create a map and set the center of the map to the first data point, probably the launch point */
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
 
@@ -360,7 +364,7 @@ function downloadCSVFile() {
     }
 
     var hiddenElement = document.createElement('a');
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(wsprJSONText);
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
     hiddenElement.target = '_blank';
     
     //provide the name for the CSV file to be downloaded
@@ -420,9 +424,12 @@ function downloadJSONFile() {
 
 function ClearForm() {
     "use strict";
-
+    /* Reset the mapdiv in case it was already displayed */
+    document.getElementById('mapdiv').innerHTML = "<div id='map'></div>";
     document.getElementById("ReporterError").innerHTML = "";
     document.getElementById("FromDateError").innerHTML = "";
     document.getElementById("ToDateError").innerHTML = "";
-    document.getElementById("tabledata").innerHTML = "";    
+    document.getElementById("data").innerHTML = "";    
+    document.getElementById("status").innerHTML = "";
+    document.getElementById("rdShowMap").checked = true;    
 }
