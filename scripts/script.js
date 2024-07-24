@@ -66,8 +66,8 @@ var FromDate = "";
 var ToDate = "";
 
 var wsprDataPoints;         // Number of data values from WSPR database
-var wsprSpots;               // Number of unique balloon spots
-var wsprListeners;           // Number of unique listeners
+var wsprSpots;              // Number of unique balloon spots
+var wsprListeners;          // Number of unique listeners
 
 async function ProcessForm() {
     // Get a reference to the form - Use the ID of the form
@@ -77,12 +77,16 @@ async function ProcessForm() {
     if (form.valid()) { 
 
         document.getElementById("map").style.display = "none";  
-        document.getElementById("data").style.display = "none";  
+        document.getElementById("mapcontainer").style.display = "none";  
+        document.getElementById("data").style.display = "none";   
+
         if (document.getElementById("rdShowMapAndListeners").checked || document.getElementById("rdShowMap").checked) {
-            document.getElementById("map").style.display = "inline-block";              
+            document.getElementById("mapcontainer").style.display = "block";    
+            document.getElementById("map").style.display = "block";              
+          
         }
         if (document.getElementById("rdShowData").checked) {
-            document.getElementById("data").style.display = "inline-block";              
+            document.getElementById("data").style.display = "block";              
         }
 
         document.getElementById("status").innerHTML = "Retrieving Data from Database...";  
@@ -151,9 +155,7 @@ async function ProcessForm() {
                     downloadJSONFile();
                     document.getElementById("status").innerHTML = "Datapoints: " + wsprDataPoints; 
                 }
-            } else {
-                    document.getElementById("status").innerHTML = "No Datapoints Found...";                     
-                }            
+            }
     
         } else {
             /* AJAX complete with error */
@@ -241,11 +243,13 @@ function showMap(showListeners) {
 /*  showListeners - true - show listeners on map
     showListeners - false - do not show listeners on map
 */
-    /* Reset the Map div in case map as already displayed */
-    document.getElementById('mapdiv').innerHTML = "<div id='map' style='width: 1200px; height: 800px;'></div>";
+    /* Reset the Map Container in case map as already displayed */
+    //document.getElementById('mapdiv').innerHTML = "<div id='map' style='width: 1200px; height: 800px;'></div>";
+    document.getElementById('mapcontainer').innerHTML = "<div id='map'></div>";
 
     /* Create a map and set the center of the map to the first data point, probably the launch point */
     const map = L.map('map').setView([tx_lat[0], tx_lon[0]], 13);
+    /* const map = L.map('map').fitWorld(); */
 
     /* Add streets and copyright */
 	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -363,6 +367,9 @@ function downloadCSVFile() {
         csv = csv + altitude[i] + "\n";
     }
 
+    /* Display Table Data */
+    document.getElementById("data").innerHTML = csv;
+
     var hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
     hiddenElement.target = '_blank';
@@ -425,10 +432,11 @@ function downloadJSONFile() {
 function ClearForm() {
     "use strict";
     /* Reset the mapdiv in case it was already displayed */
-    document.getElementById('mapdiv').innerHTML = "<div id='map'></div>";
     document.getElementById("ReporterError").innerHTML = "";
     document.getElementById("FromDateError").innerHTML = "";
     document.getElementById("ToDateError").innerHTML = "";
+    document.getElementById('mapcontainer').innerHTML = "<div id='map'></div>";    document.getElementById('mapcontainer').innerHTML = "<div id='map'></div>";
+    document.getElementById("mapcontainer").style.display = "none";  
     document.getElementById("data").innerHTML = "";    
     document.getElementById("status").innerHTML = "";
     document.getElementById("rdShowMap").checked = true;    

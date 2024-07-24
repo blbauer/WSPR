@@ -1,6 +1,6 @@
 .formlabel {
     display: inline-block;
-    width: 150px;
+    width: 125px;
     text-align: right;
     padding: 5px;
 }
@@ -20,8 +20,25 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-  
-html, body {
-	height: 100%;
-	margin: 0;
+
+#mapcontainerx {
+    padding: 0px; 
+    margin: 25px; 
+    border: 15px solid black;
+    display: none;
+}
+#map { 
+    height: 75vh; 
+    width: 100%;
+    padding: 0px; 
+    margin: 0px; 
+
+}
+
+.mono {
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+.report:hover {
+    cursor: pointer;
+    background-color: gray;
 }

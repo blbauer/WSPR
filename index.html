@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Polygon - Company Details">
     <meta name="keywords" content="HTML, CSS,JavaScript, AJAX, jQuery">
     <meta name="author" content="Bruce Bauer">
@@ -16,6 +16,8 @@
     <form id="myform" onsubmit="return false">
         <div>
             <h2>WSPR Data</h2>
+            <hr>
+            <div style="float:left; width: 25%">
             <label for="Reporter" class="formlabel" >Enter Reporter: </label>
             <input type="text" id="Reporter" name="Reporter" size="8" maxlength="8"
                     data-rule-required="true"  data-msg-required="Reporter is Required"
@@ -48,12 +50,19 @@
             <input type="submit" value="DisplayData" id="DisplayData" name="DisplayData" onclick="ProcessForm();">
             <input type="submit" formnovalidate value="Clear" id="Clear" name="Clear" onclick="ClearForm();">
             <br>
-            <div id="status"></div>
-            <hr>
-            <div id="mapdiv">
-                <div id="map" style="width: 1200px; height: 800px;" ></div>
             </div>
-            <div id="data"></div>
+            <div style="float:right; width: 75%">
+            <div id="status"></div><br>
+            <!--<div id="mapdiv" style="padding: 0px; margin: 25px; border: 15px solid black">-->
+                <!--<div id="map" style="width: 1200px; height: 100%;" ></div>-->
+
+                <!--<div id="map" style="height: 50vh; width: 100%;"></div>-->
+            
+            <div id="mapcontainer">
+                <div id="map"></div>
+            </div>
+            <div id="data" class="mono"></div>
+            </div>
         </div>
     </form>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
