@@ -37,6 +37,7 @@ tr:nth-child(even) {
 
 .mono {
     font-family: "Lucida Console", "Courier New", monospace;
+    font-size:0.66vw;
 }
 .report:hover {
     cursor: pointer;

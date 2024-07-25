@@ -17,41 +17,37 @@
         <div>
             <h2>WSPR Data</h2>
             <hr>
-            <div style="float:left; width: 25%">
-            <label for="Reporter" class="formlabel" >Enter Reporter: </label>
+            <div style=" float:left; width: 200px;">
+            <label for="Reporter">Callsign:</label><br>
             <input type="text" id="Reporter" name="Reporter" size="8" maxlength="8"
-                    data-rule-required="true"  data-msg-required="Reporter is Required"
+                    data-rule-required="true"  data-msg-required="Required"
                     value="WA5LRU/2">
             <label class="error" for="Reporter" id="ReporterError"></label>
-            <br>
-            <label for="FromDate" class="formlabel" >Enter From Date: </label>
+            <br><br>
+            <label for="FromDate">From Date: </label><br>
             <input type="date" id="FromDate" name="FromDate" size="10" 
                     data-rule-required="true"  data-msg-required="From Date is Required"
                     value = "2024-04-01">
             <label class="error" for="FromDate" id="FromDateError"></label>
-            <br>
-            <label for="ToDate" class="formlabel" >Enter To Date: </label>
+            <br><br>
+            <label for="ToDate">To Date:</label><br>
             <input type="date" id="ToDate" name="ToDate" size="10"
                     data-rule-required="true"  data-msg-required="To Date is Required"
                     value = "2024-04-28">
             <label class="error" for="ToDate" id="ToDateError"></label>
-
             <br><br>
-            <label class="formlabel">Choose a Report:</label>
-            <label for="rdShowMap"><input type="radio" id="rdShowMap" name="rdData" value="Show Map" checked>Show Map</label><br>
-            <label class="formlabel">&nbsp;</label>
-            <label for="rdShowMapAndListeners"><input type="radio" id="rdShowMapAndListeners" name="rdData" value="ShowMapAndListener">Show Map and Listeners</label><br>
-            <label class="formlabel">&nbsp;</label>
-            <label for="rdShowData"><input type="radio" id="rdShowData" name="rdData" value="ShowData">Show Raw WSPR Data</label><br>
-            <label class="formlabel">&nbsp;</label>
-            <label for="rdDownloadCSVData"><input type="radio" id="rdDownloadCSVData" name="rdData" value="DownloadCSVData">Download Raw WSPR Data in .CSV format</label><br>
-            <label class="formlabel">&nbsp;</label>
-            <label for="rdDownloadJSONData"><input type="radio" id="rdDownloadJSONData" name="rdData" value="DownloadJSONData">Download Raw WSPR Data in JSON format</label><br>
-            <input type="submit" value="DisplayData" id="DisplayData" name="DisplayData" onclick="ProcessForm();">
-            <input type="submit" formnovalidate value="Clear" id="Clear" name="Clear" onclick="ClearForm();">
+            <label>Choose a Report:</label><br>
+            <label for="rdShowMap"><input type="radio" id="rdShowMap" name="rdData" value="Map" checked>Show Map</label><br>
+            <label for="rdShowMapAndListeners"><input type="radio" id="rdShowMapAndListeners" name="rdData" value="ShowMapAndListener">Map and Listeners</label><br>
+            <label for="rdShowData"><input type="radio" id="rdShowData" name="rdData" value="ShowData">Display Data</label><br>
+            <label for="rdDownloadCSVData"><input type="radio" id="rdDownloadCSVData" name="rdData" value="DownloadCSVData">Download Data(.CSV)</label><br>
+            <label for="rdDownloadJSONData"><input type="radio" id="rdDownloadJSONData" name="rdData" value="DownloadJSONData">Download Data (JSON)</label><br>
+            <br>
+            <input type="submit" value="Display Data" id="DisplayData" name="DisplayData" onclick="ProcessForm();">
+            <input type="submit" formnovalidate value="Clear Form" id="Clear" name="Clear" onclick="ClearForm();">
             <br>
             </div>
-            <div style="float:right; width: 75%">
+            <div style="float:left; width:85%">
             <div id="status"></div><br>
             <!--<div id="mapdiv" style="padding: 0px; margin: 25px; border: 15px solid black">-->
                 <!--<div id="map" style="width: 1200px; height: 100%;" ></div>-->
