@@ -180,11 +180,35 @@ async function ProcessForm() {
     
 }
 
-function calcAltitude(power) {
+/*function calcAltitude(power) {
 "use strict";
     if (power == 0) {
         return 0
     }
+    for (var i = 0; i < powerTable.length; i++) {
+        if (power < powerTable[i][1]) {
+            return powerTable[i-1][5]
+        }
+    }
+    return 0
+}
+*/
+
+function calcAltitude(power) {
+"use strict";
+// WSPR Power is in Watts
+// WSPR Live Power is in dBM
+// dBm = 10 . log10(P / 0.001)
+    if (power == 0) {
+        return 0
+    }
+    //var dBm = 10 * Math.log10(power / 0.001);
+    var dBm = power;
+    var altitudeMeters = dBm * 300;
+    var altitudeFeet = altitudeMeters  * 3.28084;
+    altitudeFeet = Math.round(altitudeFeet)
+    return altitudeFeet;
+
     for (var i = 0; i < powerTable.length; i++) {
         if (power < powerTable[i][1]) {
             return powerTable[i-1][5]
