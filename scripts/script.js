@@ -1,5 +1,5 @@
 "use strict";
-
+/* see https://ham.stackexchange.com/questions/221/how-can-one-convert-from-lat-long-to-grid-square for conversion */
 /* red pin icon */
 var RedPinIcon = L.icon({
     iconUrl: 'red_pin.png',
