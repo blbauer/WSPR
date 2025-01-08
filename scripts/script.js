@@ -68,6 +68,34 @@ for (var i = 0; i < powerTable.length; i++) {
     powerTable[i][5] = Math.round(powerTable[i][4] * 3.28084)
 }
 
+/* set if there area any parameters in the URL */
+var queryString = window.location.search;
+var urlParams = new URLSearchParams(queryString);
+
+/* Report Parameter */
+var Reporter = urlParams.get('Reporter')
+if (Reporter != null) {
+    document.getElementById("Reporter").value = Reporter
+}
+
+/* FromDate Parameter - note format: yyyy-mm-dd */
+var FromDate = urlParams.get('FromDate')
+if (FromDate != null) {
+    document.getElementById("FromDate").value = FromDate
+}
+
+/* ToDate Parameter  - note format: yyyy-mm-dd */
+var ToDate = urlParams.get('ToDate')
+if (ToDate != null) {
+    document.getElementById("ToDate").value = ToDate
+}
+
+if (Reporter != null) {
+    /* Display the Listeners */
+    document.getElementById("rdShowMapAndListeners").checked = true;
+    ProcessForm();
+}
+
 async function ProcessForm() {
 "use strict";
 
