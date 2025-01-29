@@ -79,6 +79,7 @@ if (Reporter != null) {
 }
 
 /* FromDate Parameter - note format: yyyy-mm-dd */
+/* https://blbauer.github.io/WSPR/index.html?Reporter=WA5LRU/3&FromDate=2024-10-11&ToDate=2024-10-17 */
 var FromDate = urlParams.get('FromDate')
 if (FromDate != null) {
     document.getElementById("FromDate").value = FromDate
