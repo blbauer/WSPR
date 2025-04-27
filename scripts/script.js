@@ -200,7 +200,7 @@ async function ProcessForm() {
             }
         } else {
             /* AJAX complete with error */
-            alert("Error Detected - Status: " + wsprData.status)
+            alert("Error Detected - Status: " + wsprObject.status)
             return;
         }       
     } else {
